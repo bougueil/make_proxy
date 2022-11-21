@@ -1,0 +1,14 @@
+#sudo systemctl restart mkprx.service
+
+[Unit]
+Description=make_proxy client
+
+[Service]
+Environment="WORKER_TYPE=make_proxy_client"
+WorkingDirectory=/path-of-make-proxy
+ExecStart=/path-of-make-proxy/start_make_proxy.sh 
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
