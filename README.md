@@ -1,10 +1,13 @@
 # MakeProxy
 
-Fork of make-proxy in Elixir
+Fork of make-proxy in Elixir.
 
-# build a release 
+### build a release 
+```
 WORKER_TYPE=make_proxy_client MIX_ENV=prod mix release
+```
 
-# systemd
+### systemd
+
+Systemd service : see systemd/[client|server]/mkprx.service file.<br>
 The release is without erts.
-Systemd service : see systemd/[client|server]/mkprx.service
