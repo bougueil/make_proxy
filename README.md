@@ -1,6 +1,6 @@
 # MakeProxy
 
-Fork of erlang [make-proxy](https://github.com/yueyoum/make-proxy) rewritten in Elixir with supervisor and Systemd.
+Fork of erlang [make-proxy](https://github.com/yueyoum/make-proxy) rewritten in Elixir with a supervisor and Systemd.
 
 
 ### build a release (executable)
