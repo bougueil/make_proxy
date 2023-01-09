@@ -6,4 +6,4 @@ config :make_proxy,
   client_port: 7070,
   key: "1234567890abcdef"
 
-import_config "#{Mix.env()}.exs"
+import_config "#{config_env()}.exs"
