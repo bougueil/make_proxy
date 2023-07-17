@@ -87,7 +87,7 @@ start_link(Ref, Socket, Transport, Opts) ->
 	      | ignore.
 -ifdef(IS_RANCH_2).
 init([Ref, Transport, _Opts]) ->
-    {ok, Key} = application:get_env(make_proxy, key),
+    Key = os:getenv("KEY"),
     {OK, Closed, Error, _Passive} = Transport:messages(),
 
     State = #client{
@@ -110,7 +110,7 @@ handle_continue(wait_control, #client{transport = Transport, ref = Ref} = State)
 -else.
 init([Ref, Socket, Transport, _Opts]) ->
     put(init, true),
-    {ok, Key} = application:get_env(make_proxy, key),
+    Key = os:getenv("KEY"),
     {OK, Closed, Error} = Transport:messages(),
 
     ok = Transport:setopts(Socket, [binary, {active, once}, {packet, raw}]),
