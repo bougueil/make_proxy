@@ -13,7 +13,7 @@
 -export([connect_to_remote/0]).
 
 connect_to_remote() ->
-    {ok, RemoteAddr} = application:get_env(make_proxy, server_addr),
+    RemoteAddr = os:getenv("MKP_SERVER"),
     {ok, RemotePort} = application:get_env(make_proxy, server_port),
     {ok, Addr} = inet:getaddr(charlist(RemoteAddr), inet),
     gen_tcp:connect(Addr, RemotePort, [{inet_backend,socket}, {active, once}, {packet, 4}, binary]).
