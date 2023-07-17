@@ -4,7 +4,9 @@
 Description=make_proxy client
 
 [Service]
+Environment="MKP_SERVER=127.0.0.1"
 Environment="IV=bXlJVl9pc18xNl9ieXRlcw=="
+Environment="KEY=1234567890abcdef"
 WorkingDirectory=/path-of-make-proxy
 ExecStart=/path-of-make-proxy/start_make_proxy.sh 
 Type=oneshot
