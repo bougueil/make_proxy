@@ -4,19 +4,20 @@ Fork of erlang [make-proxy](https://github.com/yueyoum/make-proxy) rewritten in 
 
 
 ### build a release (executable)
+"bXlJVl9pc18xNl9ieXRlcw==" = :base64.encode "myIV_is_16_bytes"
 ```
 # server
-WORKER_TYPE=make_proxy_server MIX_ENV=prod mix release
+IV=bXlJVl9pc18xNl9ieXRlcw== WORKER_TYPE=make_proxy_server MIX_ENV=prod mix release
 
 # client
-WORKER_TYPE=make_proxy_client MIX_ENV=prod mix release
+IV=bXlJVl9pc18xNl9ieXRlcw== WORKER_TYPE=make_proxy_client MIX_ENV=prod mix release
 ```
 
 
 
 ### systemd
 
-Systemd service : see the [mkprx.service](systemd/server/mkprx.service) server or [mkprx.service](systemd/client/mkprx.service) client.
+Systemd service : see the [mkprx.service](systemd/mkprx.service) systemd service.
 
-The releases are built *without* erts which results in small, a few MB, services.<br>
+The release is built *without* erts which results in a small, a few MB, systemd service.<br>
 Those micro-services can be stacked on very small instance servers.
