@@ -12,19 +12,18 @@
 -behaviour(gen_server).
 -behaviour(ranch_protocol).
 
--define(IS_RANCH_2, elem(1, application:get_key(ranch, vsn)) >= "2").
-
+% -define(RANCH_USE_V2, true).
 
 %% API
--ifdef(IS_RANCH_2).
--export([start_link/3]).
+-ifdef(RANCH_USE_V2).
+    -export([start_link/3]).
 -else.
--export([start_link/4]).
+    -export([start_link/4]).
 -endif.
 
 
 %% gen_server callbacks
--ifdef(IS_RANCH_2).
+-ifdef(RANCH_USE_V2).
 -export([
 	 init/1,
 	 handle_call/3,
@@ -57,7 +56,7 @@
 %%
 %% @end
 %%--------------------------------------------------------------------
--ifdef(IS_RANCH_2).
+-ifdef(RANCH_USE_V2).
 start_link(Ref, Transport, Opts) ->
     gen_server:start_link(?MODULE, [Ref, Transport, Opts], []).
 -else.
@@ -85,7 +84,7 @@ start_link(Ref, Socket, Transport, Opts) ->
 	      | {ok, State :: #client{}, timeout() | hibernate}
 	      | {stop, Reason :: term()}
 	      | ignore.
--ifdef(IS_RANCH_2).
+-ifdef(RANCH_USE_V2).
 init([Ref, Transport, _Opts]) ->
     Key = os:getenv("KEY"),
     {OK, Closed, Error, _Passive} = Transport:messages(),
@@ -179,7 +178,7 @@ handle_cast(_Request, State) ->
 	  {noreply, NewState :: #client{}}
 	      | {noreply, NewState :: #client{}, timeout() | hibernate}
 	      | {stop, Reason :: term(), NewState :: #client{}}.
--ifdef(IS_RANCH_2).
+-ifdef(RANCH_USE_V2).
 handle_info(
   {OK, Socket, Data},
   #client{socket = Socket, transport = Transport, ok = OK, protocol = undefined} = State

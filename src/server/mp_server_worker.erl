@@ -3,18 +3,12 @@
 -behaviour(gen_server).
 -behaviour(ranch_protocol).
 
--define(IS_RANCH_2, elem(1, application:get_key(ranch, vsn)) >= "2").
 
 
+-ifdef(RANCH_USE_V2).
 %% API
--ifdef(IS_RANCH_2).
 -export([start_link/3]).
--else.
--export([start_link/4]).
--endif.
-
 %% gen_server callbacks
--ifdef(IS_RANCH_2).
 -export([
     init/1,
     handle_call/3,
@@ -25,6 +19,9 @@
     code_change/3
 ]).
 -else.
+%% API
+-export([start_link/4]).
+%% gen_server callbacks
 -export([
     init/1,
     handle_call/3,
@@ -60,7 +57,7 @@
 %% @spec start_link() -> {ok, Pid} | ignore | {error, Error}
 %% @end
 %%--------------------------------------------------------------------
--ifdef(IS_RANCH_2).
+-ifdef(RANCH_USE_V2).
 start_link(Ref, Transport, Opts) ->
     gen_server:start_link(?MODULE, [Ref, Transport, Opts], []).
 -else.
@@ -83,7 +80,7 @@ start_link(Ref, Socket, Transport, Opts) ->
 %%                     {stop, Reason}
 %% @end
 %%--------------------------------------------------------------------
--ifdef(IS_RANCH_2).
+-ifdef(RANCH_USE_V2).
 init([Ref, Transport, _Opts]) ->
     put(init, true),
     Key = os:getenv("KEY"),
@@ -166,8 +163,7 @@ handle_cast(_Msg, State) ->
 %%                                   {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
-
--ifdef(IS_RANCH_2).
+-ifdef(RANCH_USE_V2).
 %% first message from client
 handle_info(
     {OK, Socket, Request},

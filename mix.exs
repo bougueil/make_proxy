@@ -8,6 +8,9 @@ defmodule MakeProxy.MixProject do
       elixir: ">= 1.14.1",
       start_permanent: Mix.env() == :prod,
       releases: releases(),
+      # ranch v1 and v2 are not compatible
+      # this flag compiles the app with ranch >= 2.0 api
+      erlc_options: [{:d, :RANCH_USE_V2}],
       deps: deps()
     ]
   end
