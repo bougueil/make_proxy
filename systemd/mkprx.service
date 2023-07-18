@@ -4,6 +4,7 @@
 Description=make_proxy client
 
 [Service]
+Environment="KEY=1234567890abcdef"
 Environment="MKP_SERVER=127.0.0.1"
 Environment="IV=bXlJVl9pc18xNl9ieXRlcw=="
 Environment="KEY=1234567890abcdef"
