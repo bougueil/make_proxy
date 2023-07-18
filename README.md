@@ -4,7 +4,13 @@ Fork of erlang [make-proxy](https://github.com/yueyoum/make-proxy) rewritten in 
 
 
 ### build a release (executable)
+
+choose IV and base64 encode it for server and client :
+
+```
 "bXlJVl9pc18xNl9ieXRlcw==" = :base64.encode "myIV_is_16_bytes"
+```
+
 ```
 # server
 IV=bXlJVl9pc18xNl9ieXRlcw== WORKER_TYPE=make_proxy_server MIX_ENV=prod mix release
