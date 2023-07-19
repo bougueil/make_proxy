@@ -5,7 +5,7 @@
 ]).
 
 -define(DATALENGTH, 16).
--define(IV,base64:decode(os:getenv("IV"))).
+-define(IV, base64:decode(os:getenv("MKP_IV"))).
 -define(IS_OTP_24, erlang:list_to_binary(erlang:system_info(otp_release)) >= <<"24">>).
 
 -ifdef(IS_OTP_24).

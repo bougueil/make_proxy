@@ -12,8 +12,6 @@
 -behaviour(gen_server).
 -behaviour(ranch_protocol).
 
-% -define(RANCH_USE_V2, true).
-
 %% API
 -ifdef(RANCH_USE_V2).
     -export([start_link/3]).
@@ -86,7 +84,7 @@ start_link(Ref, Socket, Transport, Opts) ->
 	      | ignore.
 -ifdef(RANCH_USE_V2).
 init([Ref, Transport, _Opts]) ->
-    Key = os:getenv("KEY"),
+    Key = os:getenv("MKP_KEY"),
     {OK, Closed, Error, _Passive} = Transport:messages(),
 
     State = #client{
@@ -109,7 +107,7 @@ handle_continue(wait_control, #client{transport = Transport, ref = Ref} = State)
 -else.
 init([Ref, Socket, Transport, _Opts]) ->
     put(init, true),
-    Key = os:getenv("KEY"),
+    Key = os:getenv("MKP_KEY"),
     {OK, Closed, Error} = Transport:messages(),
 
     ok = Transport:setopts(Socket, [binary, {active, once}, {packet, raw}]),

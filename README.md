@@ -2,28 +2,35 @@
 
 Fork of erlang [make-proxy](https://github.com/yueyoum/make-proxy) rewritten in Elixir with supervisor and Systemd.
 
+To run MakeProxy you need to install it on a server and on all client hosts.
 
-### build a release (executable)
 
-choose IV and base64 encode it for server and client :
 
+### build
+#### server
 ```
-"bXlJVl9pc18xNl9ieXRlcw==" = :base64.encode "myIV_is_16_bytes"
+cd make_proxy
+WORKER_TYPE=make_proxy_server MIX_ENV=prod mix release
 ```
-
+#### client
 ```
-# server
-IV=bXlJVl9pc18xNl9ieXRlcw== WORKER_TYPE=make_proxy_server MIX_ENV=prod mix release
-
-# client
-IV=bXlJVl9pc18xNl9ieXRlcw== WORKER_TYPE=make_proxy_client MIX_ENV=prod mix release
+cd make_proxy
+WORKER_TYPE=make_proxy_client MIX_ENV=prod mix release
 ```
 
 
 
 ### systemd
 
-Systemd service : see the [mkprx.service](systemd/mkprx.service) systemd service.
+Systemd service: see the [mkprx.service](systemd/mkprx.service) systemd service example.
 
-The release is built *without* erts which results in a small, a few MB, systemd service.<br>
-Those micro-services can be stacked on very small instance servers.
+#### env variables :
+- MKP_KEY=1234567890abcdef         *# must be 16 bytes*
+- MKP_SERVER=127.0.0.1
+- MKP_IV=bXlJVl9pc18xNl9ieXRlcw==
+
+MKP_IV can be generated like this :
+```
+"bXlJVl9pc18xNl9ieXRlcw==" = :base64.encode "myIV_is_16_bytes"
+```
+where "myIV_is_16_bytes" is a 16 bytes string.
