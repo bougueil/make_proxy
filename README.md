@@ -1,5 +1,6 @@
 # MakeProxy
 [![Test](https://github.com/bougueil/make_proxy/actions/workflows/ci.yml/badge.svg)](https://github.com/bougueil/make_proxy/actions/workflows/ci.yml)
+
 Fork of erlang [make-proxy](https://github.com/yueyoum/make-proxy) rewritten in Elixir with supervisor and Systemd.
 
 MakeProxy needs to be installed on a server and its clients.
