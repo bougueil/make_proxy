@@ -13,15 +13,9 @@
 -behaviour(ranch_protocol).
 
 %% API
--ifdef(RANCH_USE_V2).
-    -export([start_link/3]).
--else.
-    -export([start_link/4]).
--endif.
-
+-export([start_link/3, start_link/4]).
 
 %% gen_server callbacks
--ifdef(RANCH_USE_V2).
 -export([
 	 init/1,
 	 handle_call/3,
@@ -31,16 +25,6 @@
 	 terminate/2,
 	 code_change/3
 	]).
--else.
--export([
-	 init/1,
-	 handle_call/3,
-	 handle_cast/2,
-	 handle_info/2,
-	 terminate/2,
-	 code_change/3
-	]).
--endif.
 
 -include("mp_client.hrl").
 
@@ -54,13 +38,13 @@
 %%
 %% @end
 %%--------------------------------------------------------------------
--ifdef(RANCH_USE_V2).
+%% RANCH_USE_V2
 start_link(Ref, Transport, Opts) ->
     gen_server:start_link(?MODULE, [Ref, Transport, Opts], []).
--else.
-start_link(Ref, Socket, Transport, Opts) ->
-    gen_server:start_link(?MODULE, [Ref, Socket, Transport, Opts], []).
--endif.
+
+start_link(Ref, _Socket, Transport, Opts) ->
+    start_link(Ref, Transport, Opts).
+
 
 %%%===================================================================
 %%% gen_server callbacks
@@ -82,10 +66,13 @@ start_link(Ref, Socket, Transport, Opts) ->
 	      | {ok, State :: #client{}, timeout() | hibernate}
 	      | {stop, Reason :: term()}
 	      | ignore.
--ifdef(RANCH_USE_V2).
+%% RANCH_V2
 init([Ref, Transport, _Opts]) ->
     Key = os:getenv("MKP_KEY"),
-    {OK, Closed, Error, _Passive} = Transport:messages(),
+    case  Transport:messages() of
+        {OK, Closed, Error, _Passive} -> ok; %% RANCH V2
+        {OK, Closed, Error} -> ok
+    end,
 
     State = #client{
 	       key = Key,
@@ -104,28 +91,6 @@ handle_continue(wait_control, #client{transport = Transport, ref = Ref} = State)
     {ok, Socket} = ranch:handshake(Ref),
     ok = Transport:setopts(Socket, [binary, {active, once}, {packet, raw}]),
     {noreply, State#client{socket = Socket}}.
--else.
-init([Ref, Socket, Transport, _Opts]) ->
-    put(init, true),
-    Key = os:getenv("MKP_KEY"),
-    {OK, Closed, Error} = Transport:messages(),
-
-    ok = Transport:setopts(Socket, [binary, {active, once}, {packet, raw}]),
-
-    State = #client{
-	       key = Key,
-	       ref = Ref,
-	       transport = Transport,
-	       ok = OK,
-	       closed = Closed,
-	       error = Error,
-	       buffer = <<>>,
-	       socket = Socket,
-	       keep_alive = false
-	      },
-
-    {ok, State, 0}.
--endif.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -176,54 +141,6 @@ handle_cast(_Request, State) ->
 	  {noreply, NewState :: #client{}}
 	      | {noreply, NewState :: #client{}, timeout() | hibernate}
 	      | {stop, Reason :: term(), NewState :: #client{}}.
--ifdef(RANCH_USE_V2).
-handle_info(
-  {OK, Socket, Data},
-  #client{socket = Socket, transport = Transport, ok = OK, protocol = undefined} = State
- ) ->
-    case detect_protocol(Data) of
-        {ok, ProtocolHandler} ->
-            State1 = State#client{protocol = ProtocolHandler},
-            case ProtocolHandler:request(Data, State1) of
-                {ok, State2} ->
-                    ok = Transport:setopts(Socket, [{active, once}]),
-                    {noreply, State2};
-                {error, Reason} ->
-                    {stop, Reason, State1}
-            end;
-        {error, Reason} ->
-            {stop, Reason, State}
-    end;
-handle_info(
-  {OK, Socket, Data},
-  #client{socket = Socket, transport = Transport, ok = OK, protocol = Protocol} = State
- ) ->
-    case Protocol:request(Data, State) of
-        {ok, State1} ->
-            ok = Transport:setopts(Socket, [{active, once}]),
-            {noreply, State1};
-        {error, Reason} ->
-            {stop, Reason, State}
-    end;
-handle_info(
-  {tcp, Remote, Data},
-  #client{key = Key, socket = Socket, transport = Transport, remote = Remote} = State
- ) ->
-    {ok, RealData} = mp_crypto:decrypt(Key, Data),
-    ok = Transport:send(Socket, RealData),
-    ok = inet:setopts(Remote, [{active, once}]),
-    {noreply, State};
-handle_info({Closed, _}, #client{closed = Closed} = State) ->
-    {stop, normal, State};
-handle_info({Error, _, Reason}, #client{error = Error} = State) ->
-    {stop, Reason, State};
-handle_info({tcp_closed, _}, State) ->
-    {stop, normal, State};
-handle_info({tcp_error, _, Reason}, State) ->
-    {stop, Reason, State};
-handle_info(timeout, State) ->
-    {stop, normal, State}.
--else.
 handle_info(
   {OK, Socket, Data},
   #client{socket = Socket, transport = Transport, ok = OK, protocol = undefined} = State
@@ -279,7 +196,6 @@ handle_info(timeout, #client{ref = Ref} = State) ->
             % timeout
             {stop, normal, State}
     end.
--endif.
 
 %%--------------------------------------------------------------------
 %% @private
