@@ -7,6 +7,8 @@ Description=make_proxy client
 Environment="MKP_KEY=1234567890abcdef"
 Environment="MKP_SERVER=127.0.0.1"
 Environment="MKP_IV=bXlJVl9pc18xNl9ieXRlcw=="
+Environment="MKP_MAX_CONNECTIONS=100"
+Environment="MKP_MAX_ACCEPTORS=20"
 WorkingDirectory=/path-of-make-proxy
 ExecStart=/path-of-make-proxy/start_make_proxy.sh 
 Type=oneshot

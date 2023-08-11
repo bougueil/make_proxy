@@ -16,7 +16,7 @@ defmodule MakeProxy.Application do
       :ranch.child_spec(
         @worker,
         :ranch_tcp,
-        transport_opts(20),
+        transport_opts(),
         @protocol[@worker],
         []
       )
@@ -25,11 +25,15 @@ defmodule MakeProxy.Application do
     Supervisor.start_link([ranch_listener], opts)
   end
 
-  defp transport_opts(numAcceptors) do
+  defp transport_opts() do
     %{
-      max_connections: 100,
-      num_acceptors: numAcceptors,
+      max_connections: get_env_integer("MKP_MAX_CONNECTIONS", "100"),
+      num_acceptors: get_env_integer("MKP_MAX_ACCEPTORS", "10"),
       socket_opts: [port: @port]
     }
+  end
+
+  defp get_env_integer(key, default) do
+    System.get_env(key, default) |> String.to_integer()
   end
 end
