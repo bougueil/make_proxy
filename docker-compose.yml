@@ -1,0 +1,45 @@
+version: '3'  
+services:
+  mkpserver:
+    container_name: mkpserver
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile
+      args:
+        WORKER_TYPE: make_proxy_server
+
+    volumes:
+      - app_make_proxy_server:/app/
+      - /app/_build
+      - /app/deps
+    environment:
+      - MKP_KEY=1234567890abcdef
+      - MKP_IV=bXlJVl9pc18xNl9ieXRlcw==
+      - MKP_MAX_CONNECTIONS=100
+      - MKP_MAX_ACCEPTORS=20
+    
+  mkpclient:
+    container_name: mkpclient
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile
+      args:
+        WORKER_TYPE: make_proxy_client
+    depends_on:
+      - mkpserver
+    volumes:
+      - app_make_proxy_client:/app/
+      - /app/_build
+      - /app/deps
+    environment:
+      - MKP_KEY=1234567890abcdef
+      - MKP_SERVER=mkpserver
+      - MKP_IV=bXlJVl9pc18xNl9ieXRlcw==
+      - MKP_MAX_CONNECTIONS=100
+      - MKP_MAX_ACCEPTORS=20
+    ports:
+      - "7070:7070"
+
+volumes:
+  app_make_proxy_client:
+  app_make_proxy_server:
