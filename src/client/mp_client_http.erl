@@ -151,7 +151,8 @@ do_parse({ok, {http_header, _, _, _, _}, Rest}, Req) ->
 -spec parse_request_line(binary(), #http_request{}) -> {binary(), #http_request{}}.
 parse_request_line(RequestLine, Req) ->
     [Method, URL, Version] = binary:split(RequestLine, <<" ">>, [global]),
-    {ok, P} = re:compile("^((?<Ascheme>http|https)://)?(?<Bhost>[^:|^/]+):?(?<Cport>\\d*)(?<Dpath>/?.*)"),
+    {ok, P} = re:compile("^((?<Ascheme>https?)://)?(?<Bhost>(\\[[^\\]]+\\])|[^:|^/]+):?(?<Cport>\\d*)(?<Dpath>/?.*)"),
+
     {match, [Scheme, Host, Port, Path]} = re:run(
         URL,
         P,
