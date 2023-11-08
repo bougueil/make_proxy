@@ -170,11 +170,18 @@ parse_request_line(RequestLine, Req) ->
 
     Req1 = Req#http_request{
         method = Method,
-        host = binary_to_list(Host),
+        host = binary_to_list(resolve_host(Host)),
         port = Port1
     },
 
     {RequestLine1, Req1}.
+
+
+-spec resolve_host(binary()) -> binary().
+resolve_host(<<"[", Host/binary>>) ->
+    binary:part(Host, 0, byte_size(Host) -1);
+resolve_host(Host) ->
+    Host.
 
 -spec find_port(binary(), binary()) -> integer().
 find_port(<<"http">>, <<>>) ->
