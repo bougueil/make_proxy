@@ -241,13 +241,10 @@ connect_to_remote(Data, Key) ->
             {error, Error}
     end.
 
--spec connect_target(inet:ip_address(), inet:port_number()) ->
+-spec connect_target(inet:ip6_address()|list(), inet:port_number()) ->
     {ok, inet:socket()} | {error, term()}.
 connect_target(Address, Port) ->
-    connect_target( case inet:parse_ipv6strict_address(Address) of
-			{ok, IPv6} -> IPv6;
-			_ -> Address
-		    end, Port, 2).
+    connect_target(Address, Port, 2).
 
 connect_target(_, _, 0) ->
     {error, connect_failure};
