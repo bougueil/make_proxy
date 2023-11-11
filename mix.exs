@@ -23,7 +23,7 @@ defmodule MakeProxy.MixProject do
   defp deps do
     [
       {:ranch, "~> 2.1.0"},
-      {:dialyxir, "~> 1.3", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
