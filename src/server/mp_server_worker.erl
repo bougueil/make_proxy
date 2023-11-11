@@ -246,8 +246,8 @@ connect_to_remote(Data, Key) ->
 connect_target(Address, Port) ->
     connect_target(Address, Port, 2).
 
-connect_target(_, _, 0) ->
-    {error, connect_failure};
+connect_target(Address, Port, 0) ->
+    {error, {connect_failure, Address, Port}};
 connect_target(Address, Port, RetryTimes) ->
     case gen_tcp:connect(Address, Port, [{inet_backend, socket}, {active, once}, binary], 5000) of
         {ok, TargetSocket} ->
