@@ -145,15 +145,18 @@ do_parse({ok, {http_header, _, _, _, _}, Rest}, Req) ->
 -spec parse_request_line(binary(), #http_request{}) -> {binary(), #http_request{}}.
 parse_request_line(RequestLine, Req) ->
     [Method, URL, Version] = binary:split(RequestLine, <<" ">>, [global]),
+
     #{path := Path, host := Host, port := Port} =
 	maps:merge(#{port => 80},
-		   case URL of
-		       <<"http://", _/binary>> ->
-			   uri_string:parse(URL);
-		       _ ->
-			   %% URL should'nt start with https
-			   uri_string:parse(<<"http://", URL/binary>>)
-		   end),
+		   uri_string:parse(
+		     case URL of
+			 <<"http://", _/binary>> ->
+			     URL;
+			 _ ->
+			     <<"http://", URL/binary>>
+		     end)
+		  ),
+
     Path1 = case Path of
 		<<>> -> <<"/">>;
 		_ -> Path
