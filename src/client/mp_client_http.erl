@@ -135,12 +135,6 @@ do_parse({ok, http_eoh, Rest},
             }
     end;
 
-%%do_parse({ok, {http_header, _Num, 'Host', _, Value}, Rest}, Req) ->
-%%    {Host, Port} = split_host_and_port(Value),
-%%
-%%    Req1 = Req#http_request{host = Host, port = Port},
-%%    do_parse(erlang:decode_packet(httph_bin, Rest, []), Req1);
-
 do_parse({ok, {http_header, _Num, 'Content-Length', _, Value}, Rest}, Req) ->
     Req1 = Req#http_request{content_length = binary_to_integer(Value)},
     do_parse(erlang:decode_packet(httph_bin, Rest, []), Req1);
@@ -151,44 +145,31 @@ do_parse({ok, {http_header, _, _, _, _}, Rest}, Req) ->
 -spec parse_request_line(binary(), #http_request{}) -> {binary(), #http_request{}}.
 parse_request_line(RequestLine, Req) ->
     [Method, URL, Version] = binary:split(RequestLine, <<" ">>, [global]),
-    {ok, P} = re:compile("^((?<Ascheme>https?)://)?(?<Bhost>(\\[[^\\]]+\\])|[^:|^/]+):?(?<Cport>\\d*)(?<Dpath>/?.*)"),
+    #{path := Path, host := Host, port := Port} =
+	maps:merge(#{port => 80},
+		   case URL of
+		       <<"http://", _/binary>> ->
+			   uri_string:parse(URL);
+		       _ ->
+			   %% URL should'nt start with https
+			   uri_string:parse(<<"http://", URL/binary>>)
+		   end),
+    Path1 = case Path of
+		<<>> -> <<"/">>;
+		_ -> Path
+	    end,
+    {
+     [Method, " ", Path1, " ", Version],
+     Req#http_request{
+       method = Method,
+       host = resolve_host(binary_to_list(Host)),
+       port = Port
+      }
+    }.
 
-    {match, [Scheme, Host, Port, Path]} = re:run(
-        URL,
-        P,
-        [{capture, all_names, binary}]
-    ),
-
-    Port1 = find_port(Scheme, Port),
-    Path1 =
-        case Path of
-            <<>> -> <<"/">>;
-            _ -> Path
-        end,
-
-    RequestLine1 = erlang:iolist_to_binary([Method, " ", Path1, " ", Version]),
-
-    Req1 = Req#http_request{
-        method = Method,
-        host = resolve_host(Host),
-        port = Port1
-    },
-
-    {RequestLine1, Req1}.
-
--spec resolve_host(binary()) -> list()|inet:ip6_address().
-resolve_host(<<"[", Host/binary>>) ->
-    {ok, Addr} = inet:parse_ipv6strict_address(binary_to_list(binary:part(Host, 0, byte_size(Host) - 1))),
-    Addr;
+-spec resolve_host(binary()) -> list()|inet:address().
 resolve_host(Host) ->
-    binary_to_list(Host).
-
--spec find_port(binary(), binary()) -> integer().
-find_port(<<"http">>, <<>>) ->
-    80;
-
-find_port(<<"https">>, <<>>) ->
-    443;
-
-find_port(_, PortBin) ->
-    binary_to_integer(PortBin).
+    case inet_parse:address(Host) of
+	{ok, Addr} -> Addr;
+	_ -> Host
+    end.
