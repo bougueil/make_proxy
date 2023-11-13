@@ -1,10 +1,12 @@
 defmodule MakeProxy.MixProject do
   use Mix.Project
 
+  @version "0.1.0"
+
   def project do
     [
       app: :make_proxy,
-      version: "0.1.0",
+      version: @version,
       elixir: ">= 1.14.1",
       start_permanent: Mix.env() == :prod,
       releases: releases(),
@@ -32,7 +34,7 @@ defmodule MakeProxy.MixProject do
     [
       make_proxy: [
         include_erts: false,
-        version: "0.1.0",
+        version: @version,
         include_executables_for: [:unix],
         cookie: "make_proxy"
       ]
