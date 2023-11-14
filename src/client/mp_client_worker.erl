@@ -185,17 +185,8 @@ handle_info({tcp_closed, _}, State) ->
     {stop, normal, State};
 handle_info({tcp_error, _, Reason}, State) ->
     {stop, Reason, State};
-handle_info(timeout, #client{ref = Ref} = State) ->
-    case get(init) of
-        true ->
-            % init
-            ok = ranch:accept_ack(Ref),
-            erase(init),
-            {noreply, State};
-        undefined ->
-            % timeout
-            {stop, normal, State}
-    end.
+handle_info(timeout, State) ->
+    {stop, normal, State}.
 
 %%--------------------------------------------------------------------
 %% @private

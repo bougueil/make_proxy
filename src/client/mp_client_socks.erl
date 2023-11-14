@@ -40,11 +40,11 @@ request(Data,
         {error, Reason} ->
             {error, Reason};
         more ->
-            case byte_size(Buffer) =:= 0 of
-                true ->
+            case Buffer of
+                <<>> ->
                     % reply success info
                     ok = Transport:send(Socket, <<5, 0>>);
-                false ->
+                _ ->
                     ok
             end,
             {ok, State#client{buffer = Data1}}

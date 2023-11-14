@@ -108,11 +108,8 @@ do_parse({ok, http_eoh, Rest}, #http_request{content_length = 0} = Req) ->
 
 do_parse({ok, http_eoh, Rest},
     #http_request{content_length = ContentLength,
-        current_length = CurrentLength} = Req) when ContentLength =:= CurrentLength ->
-    Req#http_request{
-        status = done,
-        next_data = Rest
-    };
+        current_length = ContentLength} = Req) ->
+    Req#http_request{status = done, next_data = Rest};
 
 do_parse({ok, http_eoh, Rest},
     #http_request{content_length = ContentLength, current_length = CurrentLength} = Req) ->
