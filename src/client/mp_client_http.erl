@@ -139,7 +139,7 @@ do_parse({ok, {http_header, _Num, 'Content-Length', _, Value}, Rest}, Req) ->
 do_parse({ok, {http_header, _, _, _, _}, Rest}, Req) ->
     do_parse(erlang:decode_packet(httph_bin, Rest, []), Req).
 
--spec parse_request_line(binary(), #http_request{}) -> {binary(), #http_request{}}.
+-spec parse_request_line(binary(), #http_request{}) -> {iodata(), #http_request{}}.
 parse_request_line(RequestLine, Req) ->
     [Method, URL, Version] = binary:split(RequestLine, <<" ">>, [global]),
 
@@ -167,9 +167,9 @@ parse_request_line(RequestLine, Req) ->
       }
     }.
 
--spec resolve_host(binary()) -> list()|inet:address().
+-spec resolve_host(list()) -> list() | inet:ip_address().
 resolve_host(Host) ->
-    case inet_parse:address(Host) of
+    case inet:parse_address(Host) of
 	{ok, Addr} -> Addr;
 	_ -> Host
     end.

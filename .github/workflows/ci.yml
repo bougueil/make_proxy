@@ -59,6 +59,7 @@ jobs:
         run: mix credo
         if: ${{ matrix.lint }}
 
+      - name: Run dialyzer
+        run: mix dialyzer --unmatched_returns
+        if: ${{ matrix.lint }}
 
-
-    

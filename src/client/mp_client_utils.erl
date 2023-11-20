@@ -21,5 +21,5 @@ connect_to_remote() ->
 
 charlist(Str) when is_list(Str) ->
     Str;
-charlist(Str) ->
-    binary:bin_to_list(Str).
+charlist(false) ->
+    exit(unset_env_MKP_SERVER).

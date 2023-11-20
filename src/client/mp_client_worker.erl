@@ -61,12 +61,9 @@ start_link(Ref, _Socket, Transport, Opts) ->
 %%                     {stop, Reason}
 %% @end
 %%--------------------------------------------------------------------
--spec init(Args :: term()) ->
-	  {ok, State :: #client{}}
-	      | {ok, State :: #client{}, timeout() | hibernate}
-	      | {stop, Reason :: term()}
-	      | ignore.
-%% RANCH_V2
+-spec init([any(),...]) ->
+    {'ok', #client{key::string(),transport::atom(),buffer::<<>>,keep_alive::'false'},{'continue','wait_control'}}.
+
 init([Ref, Transport, _Opts]) ->
     Key = os:getenv("MKP_KEY"),
     case  Transport:messages() of

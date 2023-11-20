@@ -241,7 +241,7 @@ connect_to_remote(Data, Key) ->
             {error, Error}
     end.
 
--spec connect_target(inet:address()|list(), inet:port_number()) ->
+-spec connect_target(inet:ip_address() | list(), inet:port_number()) ->
     {ok, inet:socket()} | {error, term()}.
 connect_target(Address, Port) ->
     connect_target(Address, Port, 2).
