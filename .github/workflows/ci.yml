@@ -48,6 +48,10 @@ jobs:
         run: mix deps.unlock --check-unused
         if: ${{ matrix.lint }}
 
+      - name: Run check-deps-outdated
+        run: mix mix hex.outdated
+        if: ${{ matrix.lint }}
+
       - name: Run deps.compile
         run: mix deps.compile
 
@@ -62,4 +66,3 @@ jobs:
       - name: Run dialyzer
         run: mix dialyzer --unmatched_returns
         if: ${{ matrix.lint }}
-
