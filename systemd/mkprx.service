@@ -2,6 +2,7 @@
 
 [Unit]
 Description=make_proxy client
+After=network.target
 
 [Service]
 Environment="MKP_KEY=1234567890abcdef"
@@ -12,6 +13,8 @@ Environment="MKP_MAX_ACCEPTORS=20"
 WorkingDirectory=/path-of-make-proxy
 ExecStart=/path-of-make-proxy/start_make_proxy.sh 
 Type=oneshot
+User=deepak
+Group=admin
 RemainAfterExit=yes
 
 [Install]
