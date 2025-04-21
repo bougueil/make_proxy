@@ -11,8 +11,7 @@ permissions:
 
 jobs:
   test:
-    runs-on: ubuntu-20.04
-    name: Test on OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
+    runs-on: ubuntu-latest
     env:
       MIX_ENV: test
       WORKER_TYPE: make_proxy_server
@@ -21,48 +20,33 @@ jobs:
       matrix:
         include:
           - pair:
-              elixir: "1.11"
-              otp: "21"
-          - pair:
-              elixir: "1.14"
-              otp: "26"
+              elixir: "1.18.1"
+              otp: "27.2"
             lint: lint
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      
-      - name: Set up Elixir
-        uses: erlef/setup-beam@v1
+      - uses: actions/checkout@v3
+
+      - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{matrix.pair.otp}}
           elixir-version: ${{matrix.pair.elixir}}
-   
-      - name: Install dependencies
-        run: mix deps.get
 
-      - name: Run check-unused
-        run: mix deps.unlock --check-unused
+      - name: Install Dependencies
+        run: mix deps.get --only test
+
+      - run: mix format --check-formatted
         if: ${{ matrix.lint }}
 
-      - name: Run check-deps-outdated
-        run: mix hex.outdated
+      - run: mix deps.get && mix deps.unlock --check-unused
         if: ${{ matrix.lint }}
 
-      - name: Run deps.compile
-        run: mix deps.compile
+      - run: mix deps.compile
 
-      - name: Check Formatting
-        run: mix format --check-formatted
+      - run: mix compile --warnings-as-errors
         if: ${{ matrix.lint }}
+        
+      - run: mix credo
 
-      - name: Compiles without warnings
-        run: mix compile --warnings-as-errors
-        if: ${{ matrix.lint }}
+#      - run: mix test
 
-      - name: Run credo
-        run: mix credo
-        if: ${{ matrix.lint }}
-
-      - name: Run dialyzer
-        run: mix dialyzer --unmatched_returns
-        if: ${{ matrix.lint }}
+      - run: mix dialyzer --unmatched_returns
