@@ -6,9 +6,8 @@ defmodule MakeProxy.Application do
   use Application
 
   @worker System.fetch_env!("WORKER_TYPE") |> String.to_atom()
-  @protocol %{make_proxy_client: :mp_client_worker, make_proxy_server: :mp_server_worker}
-  @port_def %{make_proxy_client: :client_port, make_proxy_server: :server_port}
-  @port Application.compile_env!(:make_proxy, @port_def[@worker])
+  @port Application.compile_env!(:make_proxy, [@worker, :port])
+  @protocol_worker Application.compile_env!(:make_proxy, [@worker, :worker])
 
   @impl true
   def start(_type, _args) do
@@ -17,7 +16,7 @@ defmodule MakeProxy.Application do
         @worker,
         :ranch_tcp,
         transport_opts(),
-        @protocol[@worker],
+        @protocol_worker,
         []
       )
 
