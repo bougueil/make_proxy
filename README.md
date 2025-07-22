@@ -37,6 +37,6 @@ Systemd service: see the [mkprx.service](systemd/mkprx.service) systemd service 
 
 MKP_IV can be generated like this :
 ```
-"bXlJVl9pc18xNl9ieXRlcw==" = :base64.encode "myIV_is_16_bytes"
+"bXlJVl9pc18xNl9ieXRlcw==" = Base.encode64 "myIV_is_16_bytes"
 ```
 where "myIV_is_16_bytes" is a 16 bytes string.
