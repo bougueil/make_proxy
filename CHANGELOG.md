@@ -1,5 +1,9 @@
 # Changelog for Superls
 
+## v0.2.O  (2025-07-22)
+ * all modules are elixir
+ * add runtime.exs
+
 ## v0.1.1  (2025-04-21)
  * update ranch to v2.2
  * update CI
