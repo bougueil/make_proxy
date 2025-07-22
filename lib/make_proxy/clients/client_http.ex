@@ -9,6 +9,7 @@ defmodule MakeProxy.Client.Http do
 
   alias MakeProxy.Client
   alias MakeProxy.HttpRequest
+  alias MakeProxy.Utils
 
   # GET, POST PUT, HEAD, DELETE, TRACE, CONNECT, OPTIONS
   @http_method_head [?G, ?P, ?H, ?D, ?T, ?C, ?O]
@@ -51,14 +52,14 @@ defmodule MakeProxy.Client.Http do
          %{host: host, port: port, next_data: next_data} = req,
          %{key: key, socket: socket} = state
        ) do
-    case :mp_client_utils.connect_to_remote() do
+    case Utils.connect_to_remote() do
       {:ok, remote} ->
         :ok = :gen_tcp.send(remote, :mp_crypto.encrypt(key, :erlang.term_to_binary({host, port})))
 
         state1 = %{state | remote: remote, buffer: next_data}
 
         if req.method == "CONNECT" do
-          @transport.send(socket, "HTTP/1.1 200 OK\r\n\r\n")
+          _ = @transport.send(socket, "HTTP/1.1 200 OK\r\n\r\n")
           {:ok, %{state1 | keep_alive: true}}
         else
           this_data = :binary.part(data, 0, byte_size(data) - byte_size(next_data))
