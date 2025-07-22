@@ -1,8 +1,8 @@
 import Config
 
 config :make_proxy,
-  server_port: 7071,
-  client_port: 7070
+  make_proxy_server: [port: 7071, worker: MakeProxy.Worker.Server],
+  make_proxy_client: [port: 7070, worker: MakeProxy.Worker.Client]
 
 config :logger, :default_handler,
   handle_otp_reports: true,
