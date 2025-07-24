@@ -7,6 +7,7 @@ defmodule MakeProxy.Worker.Client do
   @behaviour :ranch_protocol
 
   alias MakeProxy.Client
+  alias MakeProxy.Crypto
 
   @transport :ranch_tcp
 
@@ -68,7 +69,7 @@ defmodule MakeProxy.Worker.Client do
   end
 
   def handle_info({:tcp, remote, data}, %{key: key, socket: socket, remote: remote} = state) do
-    with {:ok, data} <- :mp_crypto.decrypt(key, data),
+    with {:ok, data} <- Crypto.decrypt(key, data),
          :ok <- @transport.send(socket, data),
          :ok <- :inet.setopts(remote, active: :once) do
       {:noreply, state}

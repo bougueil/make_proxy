@@ -10,6 +10,7 @@ defmodule MakeProxy.Client.Socks do
 
   alias MakeProxy.Client
   alias MakeProxy.Utils
+  alias MakeProxy.Crypto
 
   @impl MakeProxy.Client.Protocol
   def detect_head(version), do: version in [4, 5]
@@ -24,8 +25,8 @@ defmodule MakeProxy.Client.Socks do
 
     with {:ok, target, body, response} <- find_target(data1),
          {:ok, remote} <- Utils.connect_to_remote(),
-         :ok <- :gen_tcp.send(remote, :mp_crypto.encrypt(key, :erlang.term_to_binary(target))),
-         _ <- if(body == "", do: :ok, else: :gen_tcp.send(remote, :mp_crypto.encrypt(key, body))),
+         :ok <- :gen_tcp.send(remote, Crypto.encrypt(key, :erlang.term_to_binary(target))),
+         _ <- if(body == "", do: :ok, else: :gen_tcp.send(remote, Crypto.encrypt(key, body))),
          :ok <- @transport.send(socket, response) do
       {:ok, %{state | remote: remote}}
     else
@@ -40,7 +41,7 @@ defmodule MakeProxy.Client.Socks do
   end
 
   def request(data, %Client{key: key, remote: remote} = state) do
-    :ok = :gen_tcp.send(remote, :mp_crypto.encrypt(key, data))
+    :ok = :gen_tcp.send(remote, Crypto.encrypt(key, data))
     {:ok, state}
   end
 

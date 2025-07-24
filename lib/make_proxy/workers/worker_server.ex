@@ -7,6 +7,7 @@ defmodule MakeProxy.Worker.Server do
   @behaviour :ranch_protocol
   @timeout :timer.minutes(10)
   @transport :ranch_tcp
+  alias MakeProxy.Crypto
 
   @impl true
   def start_link(ref, @transport, _opts) do
@@ -52,7 +53,7 @@ defmodule MakeProxy.Worker.Server do
         {:tcp, socket, request},
         %{key: key, socket: socket, remote: remote} = state
       ) do
-    with {:ok, request} <- :mp_crypto.decrypt(key, request),
+    with {:ok, request} <- Crypto.decrypt(key, request),
          :ok <- :gen_tcp.send(remote, request),
          :ok <- @transport.setopts(socket, active: :once) do
       {:noreply, state, @timeout}
@@ -64,7 +65,7 @@ defmodule MakeProxy.Worker.Server do
 
   # recv from server, and send back to client
   def handle_info({:tcp, remote, resp}, %{key: key, socket: client, remote: remote} = state) do
-    with :ok <- @transport.send(client, :mp_crypto.encrypt(key, resp)),
+    with :ok <- @transport.send(client, Crypto.encrypt(key, resp)),
          :ok <- :inet.setopts(remote, active: :once) do
       {:noreply, state, @timeout}
     else
@@ -89,7 +90,7 @@ defmodule MakeProxy.Worker.Server do
 
   defp connect_to_remote(data, key) do
     with(
-      {:ok, data} <- :mp_crypto.decrypt(key, data),
+      {:ok, data} <- Crypto.decrypt(key, data),
       {address, port} <- :erlang.binary_to_term(data)
     ) do
       connect_target(address, port)

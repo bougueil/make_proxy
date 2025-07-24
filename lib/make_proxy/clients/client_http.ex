@@ -10,6 +10,7 @@ defmodule MakeProxy.Client.Http do
   alias MakeProxy.Client
   alias MakeProxy.HttpRequest
   alias MakeProxy.Utils
+  alias MakeProxy.Crypto
 
   # GET, POST PUT, HEAD, DELETE, TRACE, CONNECT, OPTIONS
   @http_method_head [?G, ?P, ?H, ?D, ?T, ?C, ?O]
@@ -40,7 +41,7 @@ defmodule MakeProxy.Client.Http do
   end
 
   def request(data, %Client{key: key, remote: remote, keep_alive: true} = state) do
-    _ = :gen_tcp.send(remote, :mp_crypto.encrypt(key, data))
+    _ = :gen_tcp.send(remote, Crypto.encrypt(key, data))
     {:ok, state}
   end
 
@@ -54,8 +55,7 @@ defmodule MakeProxy.Client.Http do
        ) do
     case Utils.connect_to_remote() do
       {:ok, remote} ->
-        :ok = :gen_tcp.send(remote, :mp_crypto.encrypt(key, :erlang.term_to_binary({host, port})))
-
+        :ok = :gen_tcp.send(remote, Crypto.encrypt(key, :erlang.term_to_binary({host, port})))
         state1 = %{state | remote: remote, buffer: next_data}
 
         if req.method == "CONNECT" do
@@ -63,7 +63,7 @@ defmodule MakeProxy.Client.Http do
           {:ok, %{state1 | keep_alive: true}}
         else
           this_data = :binary.part(data, 0, byte_size(data) - byte_size(next_data))
-          :ok = :gen_tcp.send(remote, :mp_crypto.encrypt(key, this_data))
+          :ok = :gen_tcp.send(remote, Crypto.encrypt(key, this_data))
           {:ok, state1}
         end
 
