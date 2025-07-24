@@ -5,7 +5,7 @@ defmodule MakeProxy.Application do
 
   use Application
 
-  @worker System.fetch_env!("WORKER_TYPE") |> String.to_atom()
+  @worker Application.compile_env!(:make_proxy, :worker)
   @port Application.compile_env!(:make_proxy, [@worker, :port])
   @protocol_worker Application.compile_env!(:make_proxy, [@worker, :worker])
 
