@@ -1,5 +1,4 @@
 defmodule MakeProxy.Crypto do
-
   @moduledoc false
 
   @datalength 16
