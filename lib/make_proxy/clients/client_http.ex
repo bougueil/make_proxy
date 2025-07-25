@@ -90,7 +90,7 @@ defmodule MakeProxy.Client.Http do
             do_parse(:erlang.decode_packet(:httph_bin, headers, []), req1)
           end
 
-        data1 = :erlang.iolist_to_binary([request_line1, "\r\n", headers])
+        data1 = IO.iodata_to_binary([request_line1, "\r\n", headers])
         {data1, req2}
     end
   end

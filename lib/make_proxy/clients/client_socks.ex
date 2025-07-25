@@ -98,14 +98,14 @@ defmodule MakeProxy.Client.Socks do
   defp split_socks5_data(1, _), do: :more
 
   defp split_socks5_data(3, <<len, domain::bytes-size(len), port::16, body::binary>>) do
-    target = {:erlang.binary_to_list(domain), port}
+    target = {to_charlist(domain), port}
     {:ok, target, body}
   end
 
   defp split_socks5_data(3, _), do: :more
 
   defp split_socks5_data(4, <<address::bytes-size(16), port::16, body::binary>>) do
-    target = {:erlang.list_to_tuple(:erlang.binary_to_list(address)), port}
+    target = {List.to_tuple(to_charlist(address)), port}
     {:ok, target, body}
   end
 
