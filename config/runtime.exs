@@ -1,6 +1,6 @@
 import Config
 
-if Application.compile_env!(:make_proxy, :worker) do
+if Application.compile_env!(:make_proxy, :worker) == :make_proxy_client do
   remote_addr = System.get_env("MKP_SERVER")
   params = Application.compile_env!(:make_proxy, :make_proxy_server)
   port = params[:port]
