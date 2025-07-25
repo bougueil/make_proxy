@@ -91,28 +91,25 @@ defmodule MakeProxy.Worker.Server do
   defp connect_to_remote(data, key) do
     with(
       {:ok, data} <- Crypto.decrypt(key, data),
-      {address, port} <- :erlang.binary_to_term(data)
+      {addr, port} <- :erlang.binary_to_term(data)
     ) do
-      connect_target(address, port)
+      connect_target(addr, port)
     end
   end
 
-  defp connect_target(address, port), do: connect_target(address, port, 2)
+  defp connect_target(addr, port), do: connect_target(addr, port, 2)
 
-  defp connect_target(address, port, 0), do: {:error, {:connect_failure, address, port}}
+  defp connect_target(addr, port, 0), do: {:error, {:connect_failure, addr, port}}
 
-  defp connect_target(address, port, retry_times) do
-    case :gen_tcp.connect(
-           address,
-           port,
-           [{:inet_backend, :socket}, {:active, :once}, :binary],
-           5000
-         ) do
+  @connect_opts [:binary, active: :once]
+
+  defp connect_target(addr, port, retry_times) do
+    case :gen_tcp.connect(addr, port, @connect_opts, 5000) do
       {:ok, _target_socket} = res ->
         res
 
       {:error, _error} ->
-        connect_target(address, port, retry_times - 1)
+        connect_target(addr, port, retry_times - 1)
     end
   end
 end
