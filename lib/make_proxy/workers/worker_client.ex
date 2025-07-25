@@ -92,14 +92,14 @@ defmodule MakeProxy.Worker.Client do
   end
 
   defp detect_protocol(<<head, _::binary>>) do
-    protocols = [MakeProxy.Client.Http, MakeProxy.Client.Socks]
+    protocols = [Client.Http, Client.Socks]
     do_detect_protocol(head, protocols)
   end
 
   defp detect_protocol(_), do: {:error, :invalid_data}
 
   defp do_detect_protocol(head, [protocol | rest]) do
-    if apply(protocol, :detect_head, [head]) do
+    if protocol.detect_head(head) do
       {:ok, protocol}
     else
       do_detect_protocol(head, rest)
