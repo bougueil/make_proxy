@@ -130,7 +130,7 @@ defmodule MakeProxy.Client.Http do
   end
 
   defp do_parse({:ok, {:http_header, _num, :"Content-Length", _, value}, rest}, req) do
-    req1 = %{req | content_length: :erlang.binary_to_integer(value)}
+    req1 = %{req | content_length: String.to_integer(value)}
     do_parse(:erlang.decode_packet(:httph_bin, rest, []), req1)
   end
 
