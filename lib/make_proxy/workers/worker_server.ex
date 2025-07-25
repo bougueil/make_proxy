@@ -10,14 +10,12 @@ defmodule MakeProxy.Worker.Server do
   alias MakeProxy.Crypto
 
   @impl true
-  def start_link(ref, @transport, _opts) do
-    GenServer.start_link(__MODULE__, ref)
-  end
+  def start_link(ref, @transport, key: key), do: GenServer.start_link(__MODULE__, [ref, key])
 
   @impl true
-  def init(ref) do
+  def init([ref, key]) do
     state = %{
-      key: Application.fetch_env!(:make_proxy, :key),
+      key: key,
       ref: ref,
       remote: nil,
       socket: nil

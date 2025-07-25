@@ -12,16 +12,14 @@ defmodule MakeProxy.Worker.Client do
   @transport :ranch_tcp
 
   @impl true
-  def start_link(ref, @transport, _opts) do
-    GenServer.start_link(__MODULE__, ref)
-  end
+  def start_link(ref, @transport, key: key), do: GenServer.start_link(__MODULE__, [ref, key])
 
   @impl true
-  def init(ref) do
+  def init([ref, key]) do
     # ranch values, see Transport:messages() :
     # OK: :tcp, Closed: :tcp_closed, Error: :tcp_error, Passive: :tcp_passive
     state = %Client{
-      key: Application.fetch_env!(:make_proxy, :key),
+      key: key,
       ref: ref,
       socket: nil,
       buffer: "",

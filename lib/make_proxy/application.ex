@@ -17,22 +17,22 @@ defmodule MakeProxy.Application do
         :ranch_tcp,
         transport_opts(),
         @protocol_worker,
-        []
+        key: Application.fetch_env!(:make_proxy, :key)
       )
 
     opts = [strategy: :one_for_one, name: MakeProxy.Supervisor]
     Supervisor.start_link([ranch_listener], opts)
   end
 
+  @max_connections "100"
+  @max_acceptors "10"
   defp transport_opts() do
     %{
-      max_connections: get_env_integer("MKP_MAX_CONNECTIONS", "100"),
-      num_acceptors: get_env_integer("MKP_MAX_ACCEPTORS", "10"),
+      max_connections: get_env_integer("MKP_MAX_CONNECTIONS", @max_connections),
+      num_acceptors: get_env_integer("MKP_MAX_ACCEPTORS", @max_acceptors),
       socket_opts: [port: @port]
     }
   end
 
-  defp get_env_integer(key, default) do
-    System.get_env(key, default) |> String.to_integer()
-  end
+  defp get_env_integer(key, default), do: System.get_env(key, default) |> String.to_integer()
 end
