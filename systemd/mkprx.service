@@ -1,21 +1,22 @@
-#sudo systemctl restart mkprx.service
+# COPY THIS FILE to /etc/systemd/system
+# systemctl daemon-reload
+# systemctl restart mkprx.service
 
 [Unit]
 Description=make_proxy client
 After=network.target
 
 [Service]
-Environment="MKP_KEY=1234567890abcdef"
-Environment="MKP_SERVER=127.0.0.1"
-Environment="MKP_IV=bXlJVl9pc18xNl9ieXRlcw=="
-Environment="MKP_MAX_CONNECTIONS=100"
-Environment="MKP_MAX_ACCEPTORS=20"
-WorkingDirectory=/path-of-make-proxy
-ExecStart=/path-of-make-proxy/start_make_proxy.sh 
-Type=oneshot
-User=deepak
-Group=admin
-RemainAfterExit=yes
+User=root
+EnvironmentFile=/root/make_proxy/systemd/.env
+Environment=LANG=en_US.utf8
+WorkingDirectory=/root/make_proxy
+ExecStart=/root/make_proxy/_build/prod/rel/make_proxy/bin/make_proxy start
+ExecStop=/root/make_proxy/_build/prod/rel/make_proxy/bin/make_proxy stop
+KillMode=process
+Restart=on-failure
+LimitNOFILE=65535
+SyslogIdentifier=mkprx
 
 [Install]
 WantedBy=multi-user.target
