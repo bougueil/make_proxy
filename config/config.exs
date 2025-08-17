@@ -9,7 +9,6 @@ config :logger, :default_handler,
   handle_otp_reports: true,
   handle_sasl_reports: true
 
-config :logger, :default_formatter,
-  format: "$time $metadata[$level] $message\n"
+config :logger, :default_formatter, format: "$time $metadata[$level] $message\n"
 
 import_config "#{config_env()}.exs"
