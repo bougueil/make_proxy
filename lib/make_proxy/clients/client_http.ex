@@ -13,7 +13,7 @@ defmodule MakeProxy.Client.Http do
   alias MakeProxy.Crypto
 
   # GET, POST PUT, HEAD, DELETE, TRACE, CONNECT, OPTIONS
-  @http_method_head [?G, ?P, ?H, ?D, ?T, ?C, ?O]
+  @http_method_head ~c"GPHDTCO"
 
   @impl MakeProxy.Client.Protocol
   def detect_head(h), do: h in @http_method_head
