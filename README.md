@@ -29,7 +29,7 @@ Umbrella apps have 2 main benefits, improve the overall cpu efficiency (1 system
 Systemd service: see the [mkprx.service](systemd/mkprx.service) systemd service example.
 
 #### env variables :
-- ERL_EPMD_ADDRESS=127.0.1.1 # from: cat /etc/hosts | grep $HOSTNAME
+- ERL_EPMD_ADDRESS=127.0.1.1 # cat /etc/hosts | grep `hostname`
 - MKP_KEY=1234567890abcdef   # must be 16 bytes*
 - MKP_SERVER=127.0.0.1
 - MKP_IV=bXlJVl9pc18xNl9ieXRlcw==
