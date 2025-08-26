@@ -9,8 +9,8 @@ defmodule MakeProxy.Client.Socks do
   @transport :ranch_tcp
 
   alias MakeProxy.Client
-  alias MakeProxy.Utils
   alias MakeProxy.Crypto
+  alias MakeProxy.Utils
 
   @impl MakeProxy.Client.Protocol
   def detect_head(version), do: version in [4, 5]

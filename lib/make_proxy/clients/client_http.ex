@@ -8,9 +8,9 @@ defmodule MakeProxy.Client.Http do
   @transport :ranch_tcp
 
   alias MakeProxy.Client
+  alias MakeProxy.Crypto
   alias MakeProxy.HttpRequest
   alias MakeProxy.Utils
-  alias MakeProxy.Crypto
 
   # GET, POST PUT, HEAD, DELETE, TRACE, CONNECT, OPTIONS
   @http_method_head ~c"GPHDTCO"
