@@ -1,6 +1,6 @@
 # COPY THIS FILE to /etc/systemd/system
 # systemctl daemon-reload
-# systemctl restart mkprx.service
+# systemctl restart make_proxy.service
 
 [Unit]
 Description=make_proxy client
@@ -16,7 +16,7 @@ ExecStop=/root/make_proxy/_build/prod/rel/make_proxy/bin/make_proxy stop
 KillMode=process
 Restart=on-failure
 LimitNOFILE=65535
-SyslogIdentifier=mkprx
+SyslogIdentifier=make_proxy
 
 [Install]
 WantedBy=multi-user.target

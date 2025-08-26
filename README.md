@@ -26,18 +26,20 @@ Umbrella apps have 2 main benefits, improve the overall cpu efficiency (1 system
 
 ### systemd
 
-Systemd service: see the [mkprx.service](systemd/mkprx.service) systemd service example.
+Systemd service: see the [make_proxy.service](systemd/make_proxy.service) systemd service example.
 
 #### env variables :
 - ERL_EPMD_ADDRESS=127.0.1.1 # cat /etc/hosts | grep `hostname`
 - MKP_KEY=1234567890abcdef   # must be 16 bytes*
 - MKP_SERVER=127.0.0.1
 - MKP_IV=bXlJVl9pc18xNl9ieXRlcw==
-- MKP_MAX_CONNECTIONS=100	 # higher value for crappy websites
-- MKP_MAX_ACCEPTORS=20		 # number of processes that accept connections
 
 MKP_IV can be generated like this :
+
 ```
-"bXlJVl9pc18xNl9ieXRlcw==" = Base.encode64 "myIV_is_16_bytes"
+	"bXlJVl9pc18xNl9ieXRlcw==" = Base.encode64 "myIV_is_16_bytes"
 ```
 where "myIV_is_16_bytes" is a 16 bytes string.
+
+- MKP_MAX_CONNECTIONS=100	 # higher value for crappy websites
+- MKP_MAX_ACCEPTORS=20		 # number of processes that accept connections
