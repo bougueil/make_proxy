@@ -1,6 +1,3 @@
-# COPY THIS FILE to /etc/systemd/system
-# systemctl daemon-reload
-# systemctl restart make_proxy.service
 
 [Unit]
 Description=make_proxy client
