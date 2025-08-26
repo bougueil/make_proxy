@@ -1,0 +1,10 @@
+[make_proxy]
+
+enabled = true
+backend = systemd
+port = 7071
+filter = make_proxy
+banaction = %(banaction_allports)s
+maxretry = 3
+findtime = 10m
+bantime = 10m
