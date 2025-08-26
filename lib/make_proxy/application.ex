@@ -26,7 +26,7 @@ defmodule MakeProxy.Application do
 
   @max_connections "100"
   @max_acceptors "10"
-  defp transport_opts() do
+  defp transport_opts do
     %{
       max_connections: get_env_integer("MKP_MAX_CONNECTIONS", @max_connections),
       num_acceptors: get_env_integer("MKP_MAX_ACCEPTORS", @max_acceptors),
