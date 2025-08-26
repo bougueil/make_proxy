@@ -14,12 +14,10 @@ defmodule MakeProxy.Crypto do
 
   @spec decrypt({fun(), fun()}, binary()) :: {:ok, binary()} | {:error, term()}
   def decrypt({_, decrypt}, bin) do
-    try do
-      <<len::32-integer-big, real_data::bytes-size(len), _::binary>> = decrypt.(bin)
-      {:ok, real_data}
-    catch
-      error, reason ->
-        {:error, {error, reason}}
-    end
+    <<len::32-integer-big, real_data::bytes-size(len), _::binary>> = decrypt.(bin)
+    {:ok, real_data}
+  catch
+    error, reason ->
+      {:error, {error, reason}}
   end
 end
