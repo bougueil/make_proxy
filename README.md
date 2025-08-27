@@ -43,3 +43,10 @@ where "myIV_is_16_bytes" is a 16 bytes string.
 
 - MKP_MAX_CONNECTIONS=100	 # higher value for crappy websites
 - MKP_MAX_ACCEPTORS=20		 # number of processes that accept connections
+
+### fail2ban
+
+fail2ban configuration: see the [jail.local](fail2ban/jail.local) fail2ban conf example and filter.
+
+This fail2ban prevents unauthorized access to `make_proxy` server listening on public port 7071.
+
