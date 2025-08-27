@@ -64,7 +64,7 @@ defmodule MakeProxy.Worker.Server do
   end
 
   # recv from server, and send back to client
-  def handle_info({:tcp, remote, resp}, so_st = {socket, %{key: key, remote: remote} = _state}) do
+  def handle_info({:tcp, remote, resp}, {socket, %{key: key, remote: remote} = _state} = so_st) do
     with :ok <- ThousandIsland.Socket.send(socket, Crypto.encrypt(key, resp)),
          :ok <- :inet.setopts(remote, active: :once) do
       {:noreply, so_st, @timeout}
@@ -74,11 +74,11 @@ defmodule MakeProxy.Worker.Server do
     end
   end
 
-  def handle_info({:tcp_closed, remote}, so_st = {_, %{remote: remote}}) do
+  def handle_info({:tcp_closed, remote}, {_, %{remote: remote}} = so_st) do
     {:stop, {:shutdown, :peer_closed}, so_st}
   end
 
-  def handle_info(msg, so_st = {socket, _}) do
+  def handle_info(msg, {socket, _} = so_st) do
     :telemetry.execute(@telemetry_event, %{}, %{
       error: msg,
       remote_address: socket.span.start_metadata.remote_address,

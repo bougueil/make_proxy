@@ -54,7 +54,7 @@ defmodule MakeProxy.Worker.Client do
     end
   end
 
-  def handle_info({:tcp, remote, data}, so_st = {socket, %{key: key, remote: remote} = _state}) do
+  def handle_info({:tcp, remote, data}, {socket, %{key: key, remote: remote} = _state} = so_st) do
     with {:ok, data} <- Crypto.decrypt(key, data),
          :ok <- ThousandIsland.Socket.send(socket, data),
          :ok <- :inet.setopts(remote, active: :once) do
@@ -74,7 +74,7 @@ defmodule MakeProxy.Worker.Client do
     end
   end
 
-  def handle_info({:tcp_closed, remote}, so_st = {_, %{remote: remote}}),
+  def handle_info({:tcp_closed, remote}, {_, %{remote: remote}} = so_st),
     do: {:stop, {:shutdown, :peer_closed}, so_st}
 
   def handle_info(msg, {socket, _} = so_st) do
