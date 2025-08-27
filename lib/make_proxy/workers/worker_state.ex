@@ -1,4 +1,4 @@
-defmodule MakeProxy.Client do
+defmodule MakeProxy.WorkerState do
   @moduledoc false
-  defstruct [:key, :ref, :socket, :remote, :protocol, :buffer, :keep_alive]
+  defstruct [:key, :remote, :protocol, keep_alive: false, buffer: ""]
 end

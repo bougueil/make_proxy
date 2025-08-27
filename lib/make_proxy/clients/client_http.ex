@@ -5,12 +5,12 @@ defmodule MakeProxy.Client.Http do
       Protocol for HTTP
   """
 
-  @transport :ranch_tcp
+  @transport ThousandIsland.Socket
 
-  alias MakeProxy.Client
   alias MakeProxy.Crypto
   alias MakeProxy.HttpRequest
   alias MakeProxy.Utils
+  alias MakeProxy.WorkerState
 
   # GET, POST PUT, HEAD, DELETE, TRACE, CONNECT, OPTIONS
   @http_method_head ~c"GPHDTCO"
@@ -19,13 +19,13 @@ defmodule MakeProxy.Client.Http do
   def detect_head(h), do: h in @http_method_head
 
   @impl MakeProxy.Client.Protocol
-  def request(data, %Client{remote: nil, buffer: buffer} = state) do
+  def request(data, socket, %WorkerState{remote: nil, buffer: buffer} = state) do
     data1 = <<buffer::binary, data::binary>>
     {data2, req} = parse_http_request(data1)
 
     case req.status do
       :done ->
-        do_communication(data2, req, state)
+        do_communication(data2, socket, req, state)
 
       :error ->
         {:error, :parse_http_request_error}
@@ -35,12 +35,12 @@ defmodule MakeProxy.Client.Http do
     end
   end
 
-  def request(data, %Client{remote: remote, keep_alive: false} = state) do
+  def request(data, socket, %WorkerState{remote: remote, keep_alive: false} = state) do
     :gen_tcp.close(remote)
-    request(data, %{state | remote: nil})
+    request(data, socket, %{state | remote: nil})
   end
 
-  def request(data, %Client{key: key, remote: remote, keep_alive: true} = state) do
+  def request(data, _socket, %WorkerState{key: key, remote: remote, keep_alive: true} = state) do
     _ = :gen_tcp.send(remote, Crypto.encrypt(key, data))
     {:ok, state}
   end
@@ -50,8 +50,9 @@ defmodule MakeProxy.Client.Http do
   #     {error, term()}.
   defp do_communication(
          data,
+         socket,
          %{host: host, port: port, next_data: next_data} = req,
-         %{key: key, socket: socket} = state
+         %{key: key} = state
        ) do
     case Utils.connect_to_remote() do
       {:ok, remote} ->

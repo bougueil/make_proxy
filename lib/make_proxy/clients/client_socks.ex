@@ -6,11 +6,11 @@ defmodule MakeProxy.Client.Socks do
   - http://www.openssh.com/txt/socks4.protocol
   - https://www.ietf.org/rfc/rfc1928.tx
   """
-  @transport :ranch_tcp
+  @transport ThousandIsland.Socket
 
-  alias MakeProxy.Client
   alias MakeProxy.Crypto
   alias MakeProxy.Utils
+  alias MakeProxy.WorkerState
 
   @impl MakeProxy.Client.Protocol
   def detect_head(version), do: version in [4, 5]
@@ -18,7 +18,8 @@ defmodule MakeProxy.Client.Socks do
   @impl MakeProxy.Client.Protocol
   def request(
         data,
-        %Client{key: key, socket: socket, remote: nil, buffer: buffer} =
+        socket,
+        %WorkerState{key: key, remote: nil, buffer: buffer} =
           state
       ) do
     data1 = <<buffer::binary, data::binary>>
@@ -40,7 +41,7 @@ defmodule MakeProxy.Client.Socks do
     end
   end
 
-  def request(data, %Client{key: key, remote: remote} = state) do
+  def request(data, _socket, %WorkerState{key: key, remote: remote} = state) do
     :ok = :gen_tcp.send(remote, Crypto.encrypt(key, data))
     {:ok, state}
   end

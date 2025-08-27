@@ -1,5 +1,5 @@
 defmodule MakeProxy.Client.Protocol do
-  alias MakeProxy.Client
+  alias MakeProxy.WorkerState
 
   @moduledoc false
 
@@ -11,7 +11,7 @@ defmodule MakeProxy.Client.Protocol do
   @doc """
   serve a request.
   """
-  @callback request(data :: binary(), state :: %Client{}) ::
-              {:ok, state :: %Client{}}
+  @callback request(data :: binary(), socket :: term(), state :: %WorkerState{}) ::
+              {:ok, state :: %WorkerState{}}
               | {:error, reason :: term()}
 end

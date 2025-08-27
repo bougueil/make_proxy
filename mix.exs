@@ -16,7 +16,7 @@ defmodule MakeProxy.MixProject do
 
   def application do
     [
-      extra_applications: [:logger],
+      extra_applications: [:logger, :runtime_tools, :observer, :wx],
       mod: {MakeProxy.Application, []}
     ]
   end
@@ -24,7 +24,7 @@ defmodule MakeProxy.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:ranch, "~> 2.2.0"},
+      {:thousand_island, "~> 1.0"},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]

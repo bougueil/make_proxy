@@ -1,89 +1,96 @@
 defmodule MakeProxy.Worker.Server do
   @moduledoc """
-  implements `:ranch_protocol` for transport @transport
+      server worker
   """
+  use ThousandIsland.Handler
 
-  use GenServer
-  @behaviour :ranch_protocol
-  @timeout :timer.minutes(10)
-  @transport :ranch_tcp
   alias MakeProxy.Crypto
+  @timeout :timer.minutes(10)
+  @telemetry_event [:make_proxy, :connection, :server]
 
-  @impl true
-  def start_link(ref, @transport, key: key), do: GenServer.start_link(__MODULE__, [ref, key])
-
-  @impl true
-  def init([ref, key]) do
-    state = %{
-      key: key,
-      ref: ref,
-      remote: nil,
-      socket: nil
-    }
-
-    {:ok, state, {:continue, :wait_control}}
+  @impl ThousandIsland.Handler
+  def handle_connection(socket, state) do
+    :ok = ThousandIsland.Socket.setopts(socket, packet: 4)
+    {:continue, state, socket.read_timeout}
   end
 
-  @impl true
-  def handle_continue(:wait_control, %{ref: ref} = state) do
-    {:ok, socket} = :ranch.handshake(ref)
-    :ok = @transport.setopts(socket, active: :once, packet: 4)
-    {:noreply, %{state | socket: socket}}
-  end
-
-  @impl true
+  @impl ThousandIsland.Handler
   # first message from client
-  def handle_info(
-        {:tcp, socket, request},
-        %{key: key, socket: socket, remote: nil} = state
-      ) do
-    with {:ok, remote} <- connect_to_remote(request, key),
-         :ok <- @transport.setopts(socket, active: :once) do
-      {:noreply, %{state | remote: remote}, @timeout}
-    else
-      _error ->
-        {:stop, :normal, state}
+  def handle_data(request, socket, %{key: key, remote: nil} = state) do
+    case connect_to_remote(request, key) do
+      {:ok, remote} ->
+        {:continue, %{state | remote: remote}, @timeout}
+
+      {:error, {:connect_failure, _ip, _}} ->
+        {:close, state}
+
+      error ->
+        :telemetry.execute(@telemetry_event, %{}, %{
+          error: error,
+          remote_address: socket.span.start_metadata.remote_address,
+          ctx: "connect_to_remote"
+        })
+
+        {:close, state}
     end
   end
 
   # recv from client, then send to server
-  def handle_info(
-        {:tcp, socket, request},
-        %{key: key, socket: socket, remote: remote} = state
-      ) do
+  def handle_data(request, socket, %{key: key, remote: remote} = state) do
     with {:ok, request} <- Crypto.decrypt(key, request),
-         :ok <- :gen_tcp.send(remote, request),
-         :ok <- @transport.setopts(socket, active: :once) do
-      {:noreply, state, @timeout}
+         :ok <- :gen_tcp.send(remote, request) do
+      {:continue, state, @timeout}
     else
+      {:error, error} when error in [:closed] ->
+        {:close, state}
+
       error ->
-        {:stop, error, state}
+        :telemetry.execute(@telemetry_event, %{}, %{
+          error: error,
+          remote_address: socket.span.start_metadata.remote_address,
+          ctx: "connect_2"
+        })
+
+        {:error, "#{inspect(error)}", state}
     end
+  end
+
+  def handle_error(reason, socket, _state) do
+    :telemetry.execute(@telemetry_event, %{}, %{
+      error: reason,
+      remote_address: socket.span.start_metadata.remote_address,
+      ctx: "handle_error"
+    })
   end
 
   # recv from server, and send back to client
-  def handle_info({:tcp, remote, resp}, %{key: key, socket: client, remote: remote} = state) do
-    with :ok <- @transport.send(client, Crypto.encrypt(key, resp)),
+  def handle_info({:tcp, remote, resp}, so_st = {socket, %{key: key, remote: remote} = _state}) do
+    with :ok <- ThousandIsland.Socket.send(socket, Crypto.encrypt(key, resp)),
          :ok <- :inet.setopts(remote, active: :once) do
-      {:noreply, state, @timeout}
+      {:noreply, so_st, @timeout}
     else
-      _error ->
-        {:stop, :normal, state}
+      _ ->
+        {:stop, {:shutdown, :peer_closed}, so_st}
     end
   end
 
-  def handle_info({:tcp_closed, _}, state), do: {:stop, :normal, state}
-
-  def handle_info({:tcp_error, _, reason}, state) do
-    {:stop, reason, state}
+  def handle_info({:tcp_closed, remote}, so_st = {_, %{remote: remote}}) do
+    {:stop, {:shutdown, :peer_closed}, so_st}
   end
 
-  def handle_info(:timeout, state), do: {:stop, :normal, state}
+  def handle_info(msg, so_st = {socket, _}) do
+    :telemetry.execute(@telemetry_event, %{}, %{
+      error: msg,
+      remote_address: socket.span.start_metadata.remote_address,
+      ctx: "handle_info_unknown"
+    })
 
-  @impl true
-  def terminate(_reason, %{socket: socket, remote: remote}) do
-    is_port(socket) && @transport.close(socket)
-    is_port(remote) && :gen_tcp.close(remote)
+    {:stop, {:shutdown, :peer_closed}, so_st}
+  end
+
+  @impl ThousandIsland.Handler
+  def handle_close(_socket, %{remote: remote}) do
+    _ = is_port(remote) && :gen_tcp.close(remote)
   end
 
   defp connect_to_remote(data, key) do
