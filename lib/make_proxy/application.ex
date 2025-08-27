@@ -23,6 +23,8 @@ defmodule MakeProxy.Application do
        num_acceptors: get_env_integer("MKP_MAX_ACCEPTORS", @default_max_acceptors)}
     ]
 
+    :ok = MakeProxy.Logger.attach_events()
+
     opts = [strategy: :one_for_one, name: MakeProxy.Supervisor]
     Supervisor.start_link(children, opts)
   end
