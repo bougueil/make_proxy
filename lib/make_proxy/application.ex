@@ -11,7 +11,6 @@ defmodule MakeProxy.Application do
   @worker Application.compile_env!(:make_proxy, [@worker_type, :worker])
   @default_max_connections "100"
   @default_max_acceptors "10"
-  @transport_options if(@worker_type == :make_proxy_client, do: [ip: :loopback], else: [])
 
   @impl true
   def start(_type, _args) do
@@ -22,7 +21,7 @@ defmodule MakeProxy.Application do
        handler_options: %WorkerState{key: Application.fetch_env!(:make_proxy, :key)},
        num_connections: get_env_integer("MKP_MAX_CONNECTIONS", @default_max_connections),
        num_acceptors: get_env_integer("MKP_MAX_ACCEPTORS", @default_max_acceptors),
-       transport_options: @transport_options}
+       transport_options: transport_options()}
     ]
 
     :ok = MakeProxy.Logger.attach_events()
@@ -32,4 +31,14 @@ defmodule MakeProxy.Application do
   end
 
   defp get_env_integer(key, default), do: System.get_env(key, default) |> String.to_integer()
+
+  defp transport_options() do
+    if @worker_type == :make_proxy_client do
+      {:ok, hostname} = :inet.gethostname()
+      {:ok, hostname_ip} = :inet.getaddr(hostname, :inet)
+      [ip: hostname_ip]
+    else
+      []
+    end
+  end
 end
