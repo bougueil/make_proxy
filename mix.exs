@@ -9,6 +9,7 @@ defmodule MakeProxy.MixProject do
       version: @version,
       elixir: ">= 1.14.1",
       start_permanent: Mix.env() == :prod,
+      aliases: aliases(),
       releases: releases(),
       deps: deps()
     ]
@@ -37,6 +38,24 @@ defmodule MakeProxy.MixProject do
         version: @version,
         include_executables_for: [:unix],
         cookie: "make_proxy"
+      ]
+    ]
+  end
+
+  # Aliases are shortcuts or tasks specific to the current project.
+  # For example, to install project dependencies and perform other setup tasks, run:
+  #
+  #     $ mix setup
+  #
+  # See the documentation for `Mix` for more info on aliases.
+  defp aliases do
+    [
+      precommit: [
+        "compile --warning-as-errors",
+        "deps.unlock --unused",
+        "format",
+        "credo",
+        "dialyzer --unmatched_returns"
       ]
     ]
   end
