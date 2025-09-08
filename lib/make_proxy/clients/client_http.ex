@@ -117,7 +117,7 @@ defmodule MakeProxy.Client.Http do
     rest_len = byte_size(rest)
 
     if rest_len >= more_need_length do
-      <<_body::bytes-size(more_need_length), next_data::binary>> = rest
+      <<_body::bytes-size(^more_need_length), next_data::binary>> = rest
 
       %{
         req
