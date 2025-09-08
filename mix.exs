@@ -17,7 +17,7 @@ defmodule MakeProxy.MixProject do
 
   def application do
     [
-      extra_applications: [:logger, :runtime_tools, :observer, :wx],
+      extra_applications: [:logger],
       mod: {MakeProxy.Application, []}
     ]
   end
