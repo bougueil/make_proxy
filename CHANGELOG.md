@@ -1,7 +1,12 @@
 # Changelog for Superls
 
-## v0.2.O  (2025-07-22)
- * all modules are elixir
+## v0.3.0  (2025-09-01)
+ * change socket backend
+ * add telemetry and fail2ban setup
+ * socks client not tested
+
+## v0.2.0  (2025-07-22)
+ * all modules rewritten in elixir
  * add runtime.exs
 
 ## v0.1.1  (2025-04-21)
