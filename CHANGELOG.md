@@ -1,6 +1,6 @@
-# Changelog for Superls
+# Changelog
 
-## v0.3.0  (2025-09-01)
+## v0.3.0  (2025-09-22)
  * change socket backend
  * add telemetry and fail2ban setup
  * socks client not tested
