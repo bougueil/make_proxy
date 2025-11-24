@@ -5,7 +5,7 @@ Fork of Erlang [make-proxy](https://github.com/yueyoum/make-proxy) for Elixir wi
 
 `make_proxy` needs to be installed on a server (the proxy) and its clients.
 
-
+---
 
 ### build
 #### server
@@ -18,17 +18,13 @@ WORKER_TYPE=make_proxy_server MIX_ENV=prod mix do deps.get + release
 cd make_proxy
 WORKER_TYPE=make_proxy_client MIX_ENV=prod mix do deps.get + release
 ```
-
-### umbrella
-`make_proxy` may be part of an umbrella app (e.g. with phoenix).
-
-Umbrella apps have 2 main benefits, improve the overall cpu efficiency (1 system instead of 2 or more) and memory usage (socket lib shared with make_proxy and phoenix).
+---
 
 ### systemd
 
-Systemd service: see the [make_proxy.service](systemd/make_proxy.service) systemd service example.
+#### 🔐 Configure env variables :
+First review the ./.env file.
 
-#### env variables :
 - ERL_EPMD_ADDRESS=127.0.0.1
 - MKP_KEY=1234567890abcdef   # must be 16 bytes*
 - MKP_SERVER=127.0.0.1
@@ -43,6 +39,54 @@ where "myIV_is_16_bytes" is a 16 bytes string.
 
 - MKP_MAX_CONNECTIONS=100	 # higher value for crappy websites
 - MKP_MAX_ACCEPTORS=20		 # number of processes that accept connections
+
+#### generate the systemd unit file with :
+```
+./setup-make_proxy-mount.sh 
+
+```
+
+#### 🔍 Verify Mount
+
+Check systemd service:
+
+```bash
+systemctl --user status make_proxy.service
+```
+
+Ensure make_proxy is listening either on port 7070 for client or 7071 for server :
+
+```bash
+ss -ltpn
+```
+---
+
+#### 🧼 Uninstall
+
+To remove the systemd setup:
+
+```bash
+systemctl --user disable --now make_proxy.service
+rm ~/.config/systemd/user/make_proxy.service
+```
+
+---
+
+#### 🛟 Troubleshooting
+
+If make_proxy isn't listening on 7070 or 7071:
+
+```bash
+journalctl --user -u make_proxy.service
+```
+
+To restart the service manually:
+
+```bash
+systemctl --user restart make_proxy.service
+```
+
+---
 
 ### fail2ban
 
