@@ -22,7 +22,7 @@ WORKER_TYPE=make_proxy_client MIX_ENV=prod mix do deps.get + release
 ### umbrella
 `make_proxy` may be part of an umbrella app (e.g. with phoenix).
 
-Umbrella apps have 2 main benefits, improve the overall cpu efficiency (1 vm instead of 2 or more) and memory usage (the socket lib is shared with make_proxy and phoenix).
+Umbrella apps have 2 main benefits, improve the overall cpu efficiency (1 vm instead of 2 or more) and memory usage (phoenix and make_proxy share the same socket lib).
 
 ### systemd
 
