@@ -11,12 +11,12 @@ Fork of Erlang [make-proxy](https://github.com/yueyoum/make-proxy) for Elixir wi
 #### server
 ```
 cd make_proxy
-WORKER_TYPE=make_proxy_server MIX_ENV=prod mix do deps.get + release
+WORKER_TYPE=make_proxy_server MIX_ENV=prod mix build_release
 ```
 #### client
 ```
 cd make_proxy
-WORKER_TYPE=make_proxy_client MIX_ENV=prod mix do deps.get + release
+WORKER_TYPE=make_proxy_client MIX_ENV=prod mix build_release
 ```
 
 ### umbrella
