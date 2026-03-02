@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Configuration
-SYSTEMD_UNIT="$HOME/.config/systemd/user/make_proxy.service"
+SYSTEMD_PATH="$HOME/.config/systemd/user"
+SYSTEMD_UNIT="$SYSTEMD_PATH/make_proxy.service"
 CURR_DIR=${PWD}  
-
 
 # Step 1: Review Environment vars file.
 printf "\nReview the ./.env file :\n\n"
@@ -20,6 +20,7 @@ fi
 
 # Step 2: Write systemd unit
 echo "[+] Writing systemd user unit..."
+mkdir -p $SYSTEMD_PATH
 cat > "$SYSTEMD_UNIT" <<EOF
 [Unit]
 Description=make_proxy Client or Server
