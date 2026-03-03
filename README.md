@@ -46,7 +46,7 @@ where "myIV_is_16_bytes" is a 16 bytes string.
 
 #### generate the systemd unit file with :
 ```
-./setup-make_proxy-mount.sh 
+./setup-make_proxy-systemd.sh
 
 ```
 
