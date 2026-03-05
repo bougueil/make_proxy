@@ -102,19 +102,26 @@ defmodule MakeProxy.Worker.Server do
     end
   end
 
-  defp connect_target(addr, port), do: connect_target(addr, port, 2)
+  defp connect_target(addr, port) do
+    connect_opts =
+      case :inet.gethostbyname(addr, :inet6) do
+        {:error, _} -> [:binary, active: :once]
+        _ -> [:binary, :inet6, active: :once]
+      end
 
-  defp connect_target(addr, port, 0), do: {:error, {:connect_failure, addr, port}}
+    connect_target(addr, port, connect_opts, 2)
+  end
 
-  @connect_opts [:binary, active: :once]
+  defp connect_target(addr, port, _, 0), do: {:error, {:connect_failure, addr, port}}
 
-  defp connect_target(addr, port, retry_times) do
-    case :gen_tcp.connect(addr, port, @connect_opts, 5000) do
+  @timeouts %{2 => 500, 1 => 5000}
+  defp connect_target(addr, port, connect_opts, retry_times) do
+    case :gen_tcp.connect(addr, port, connect_opts, @timeouts[retry_times]) do
       {:ok, _target_socket} = res ->
         res
 
       {:error, _error} ->
-        connect_target(addr, port, retry_times - 1)
+        connect_target(addr, port, connect_opts, retry_times - 1)
     end
   end
 end

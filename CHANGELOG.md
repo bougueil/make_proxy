@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.4.0  (2025-09-22)
+ * add systemd/User (~/.config/systemd/user/)
+ * address ipv6 connectivity
+
 ## v0.3.0  (2025-09-22)
  * change socket backend
  * add telemetry and fail2ban setup
