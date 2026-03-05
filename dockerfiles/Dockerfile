@@ -34,9 +34,8 @@ COPY config/config.exs config/${MIX_ENV}.exs config/
 RUN mix deps.compile
 
 COPY lib lib
-COPY src src
-COPY include include
 
 # Compile the release
-RUN mix release
+RUN mix build_release make_proxy
+
 CMD ["./_build/prod/rel/make_proxy/bin/make_proxy", "start"]
