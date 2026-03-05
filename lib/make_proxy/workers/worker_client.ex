@@ -4,9 +4,9 @@ defmodule MakeProxy.Worker.Client do
   """
   use ThousandIsland.Handler
 
-  alias MakeProxy.SocksRequestHandler
-  alias MakeProxy.HttpRequestHandler
   alias MakeProxy.Crypto
+  alias MakeProxy.HttpRequestHandler
+  alias MakeProxy.SocksRequestHandler
   alias MakeProxy.WorkerState
 
   @telemetry_event [:make_proxy, :connection, :client]

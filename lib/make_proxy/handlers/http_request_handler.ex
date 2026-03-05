@@ -7,9 +7,9 @@ defmodule MakeProxy.HttpRequestHandler do
 
   @transport ThousandIsland.Socket
 
-  alias MakeProxy.RequestHandler
   alias MakeProxy.Crypto
   alias MakeProxy.HttpRequest
+  alias MakeProxy.RequestHandler
   alias MakeProxy.Utils
   alias MakeProxy.WorkerState
 

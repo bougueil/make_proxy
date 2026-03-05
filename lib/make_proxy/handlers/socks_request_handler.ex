@@ -8,8 +8,8 @@ defmodule MakeProxy.SocksRequestHandler do
   """
   @transport ThousandIsland.Socket
 
-  alias MakeProxy.RequestHandler
   alias MakeProxy.Crypto
+  alias MakeProxy.RequestHandler
   alias MakeProxy.Utils
   alias MakeProxy.WorkerState
 
