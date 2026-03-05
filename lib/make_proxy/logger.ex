@@ -6,7 +6,7 @@ defmodule MakeProxy.Logger do
   require Logger
 
   @doc """
-  Start logging Thousand Island at the specified log level. Valid values for log
+  Start logging make_proxy at the specified log level. Valid values for log
   level are `:error`, `:info`, `:debug`, and `:trace`. Enabling a given log
   level implicitly enables all higher log levels as well.
   """
