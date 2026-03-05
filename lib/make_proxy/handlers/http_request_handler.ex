@@ -1,12 +1,13 @@
-defmodule MakeProxy.Client.Http do
-  @behaviour MakeProxy.Client.Protocol
+defmodule MakeProxy.HttpRequestHandler do
+  @behaviour MakeProxy.RequestHandler
 
   @moduledoc """
-      Protocol for HTTP
+      Request handler for HTTP
   """
 
   @transport ThousandIsland.Socket
 
+  alias MakeProxy.RequestHandler
   alias MakeProxy.Crypto
   alias MakeProxy.HttpRequest
   alias MakeProxy.Utils
@@ -15,10 +16,10 @@ defmodule MakeProxy.Client.Http do
   # GET, POST PUT, HEAD, DELETE, TRACE, CONNECT, OPTIONS
   @http_method_head ~c"GPHDTCO"
 
-  @impl MakeProxy.Client.Protocol
+  @impl RequestHandler
   def detect_head(h), do: h in @http_method_head
 
-  @impl MakeProxy.Client.Protocol
+  @impl RequestHandler
   def request(data, socket, %WorkerState{remote: nil, buffer: buffer} = state) do
     data1 = <<buffer::binary, data::binary>>
     {data2, req} = parse_http_request(data1)

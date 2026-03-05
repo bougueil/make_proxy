@@ -1,10 +1,10 @@
-defmodule MakeProxy.Client.Protocol do
+defmodule MakeProxy.RequestHandler do
   alias MakeProxy.WorkerState
 
   @moduledoc false
 
   @doc """
-  return true if h is a valid protocol header
+  return true if h is a valid handler header
   """
   @callback detect_head(h :: byte()) :: boolean()
 

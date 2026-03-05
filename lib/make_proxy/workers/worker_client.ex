@@ -4,7 +4,8 @@ defmodule MakeProxy.Worker.Client do
   """
   use ThousandIsland.Handler
 
-  alias MakeProxy.Client
+  alias MakeProxy.SocksRequestHandler
+  alias MakeProxy.HttpRequestHandler
   alias MakeProxy.Crypto
   alias MakeProxy.WorkerState
 
@@ -17,11 +18,11 @@ defmodule MakeProxy.Worker.Client do
   end
 
   @impl ThousandIsland.Handler
-  def handle_data(data, socket, %{protocol: nil} = state) do
-    with {:ok, protocol_handler} <- detect_protocol(data),
-         protocol <- &protocol_handler.request/3,
-         state1 <- %{state | protocol: protocol},
-         {:ok, state2} <- protocol.(data, socket, state1) do
+  def handle_data(data, socket, %{handler: nil} = state) do
+    with {:ok, protocol_handler} <- detect_handler(data),
+         handler <- &protocol_handler.request/3,
+         state1 <- %{state | handler: handler},
+         {:ok, state2} <- handler.(data, socket, state1) do
       {:continue, state2}
     else
       {:error, error} when error in [:econnrefused, :enetunreach, :ehostunreach] ->
@@ -31,15 +32,15 @@ defmodule MakeProxy.Worker.Client do
         :telemetry.execute(@telemetry_event, %{}, %{
           error: error,
           remote_address: socket.span.start_metadata.remote_address,
-          ctx: "detect_protocol"
+          ctx: "detect_handler"
         })
 
         {:error, "#{inspect(error)}", state}
     end
   end
 
-  def handle_data(data, socket, %{protocol: protocol} = state) do
-    case protocol.(data, socket, state) do
+  def handle_data(data, socket, %{handler: handler} = state) do
+    case handler.(data, socket, state) do
       {:ok, state1} ->
         {:continue, state1}
 
@@ -47,7 +48,7 @@ defmodule MakeProxy.Worker.Client do
         :telemetry.execute(@telemetry_event, %{}, %{
           error: error,
           remote_address: socket.span.start_metadata.remote_address,
-          ctx: "do protocol"
+          ctx: "do handler"
         })
 
         {:error, "#{inspect(error)}", state}
@@ -92,20 +93,20 @@ defmodule MakeProxy.Worker.Client do
     _ = is_port(remote) && :gen_tcp.close(remote)
   end
 
-  defp detect_protocol(<<head, _::binary>>) do
-    protocols = [Client.Http, Client.Socks]
-    do_detect_protocol(head, protocols)
+  defp detect_handler(<<head, _::binary>>) do
+    handlers = [HttpRequestHandler, SocksRequestHandler]
+    do_detect_handler(head, handlers)
   end
 
-  defp detect_protocol(_), do: {:error, :invalid_data}
+  defp detect_handler(_), do: {:error, :invalid_data}
 
-  defp do_detect_protocol(head, [protocol | rest]) do
-    if protocol.detect_head(head) do
-      {:ok, protocol}
+  defp do_detect_handler(head, [handler | rest]) do
+    if handler.detect_head(head) do
+      {:ok, handler}
     else
-      do_detect_protocol(head, rest)
+      do_detect_handler(head, rest)
     end
   end
 
-  defp do_detect_protocol(_, []), do: {:error, :no_protocol_handler}
+  defp do_detect_handler(_, []), do: {:error, :no_protocol_handler}
 end

@@ -1,21 +1,22 @@
-defmodule MakeProxy.Client.Socks do
-  @behaviour MakeProxy.Client.Protocol
+defmodule MakeProxy.SocksRequestHandler do
+  @behaviour MakeProxy.RequestHandler
 
   @moduledoc """
-  Protocol for Socks :
+  Socks handler for Socks :
   - http://www.openssh.com/txt/socks4.protocol
   - https://www.ietf.org/rfc/rfc1928.tx
   """
   @transport ThousandIsland.Socket
 
+  alias MakeProxy.RequestHandler
   alias MakeProxy.Crypto
   alias MakeProxy.Utils
   alias MakeProxy.WorkerState
 
-  @impl MakeProxy.Client.Protocol
+  @impl RequestHandler
   def detect_head(version), do: version in [4, 5]
 
-  @impl MakeProxy.Client.Protocol
+  @impl RequestHandler
   def request(
         data,
         socket,
