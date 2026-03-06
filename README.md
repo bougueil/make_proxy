@@ -20,9 +20,29 @@ WORKER_TYPE=make_proxy_client MIX_ENV=prod mix build_release
 ```
 
 ### umbrella
-`make_proxy` may be part of an umbrella app (e.g. with phoenix).
+`make_proxy` may be part of an umbrella app (e.g. with phoenix) as a dependency.
 
 Umbrella apps have 2 main benefits, improve the overall cpu efficiency (1 vm instead of 2 or more) and memory usage (phoenix and make_proxy share the same socket lib).
+
+Add the dependency :      
+```
+{:make_proxy, git: "https://github.com/bougueil/make_proxy.git"}
+```
+
+Finally, add in config/config.exs :
+```
+config :make_proxy,
+  make_proxy_server: [port: 7071, worker: MakeProxy.Worker.Server],
+  make_proxy_client: [port: 7070, worker: MakeProxy.Worker.Client],
+  worker: System.fetch_env!("WORKER_TYPE") |> String.to_atom()
+```
+
+The umbrella app may log `make_proxy` errors :
+```
+# in application.ex
+MakeProxy.Logger.attach_events()
+```
+
 
 ### systemd
 
@@ -31,7 +51,7 @@ First review the ./.env file.
 
 - ERL_EPMD_ADDRESS=127.0.0.1
 - MKP_KEY=1234567890abcdef   # must be 16 bytes*
-- MKP_SERVER=127.0.0.1
+- MKP_SERVER=127.0.0.1 # the distant server proxy address
 - MKP_IV=bXlJVl9pc18xNl9ieXRlcw==
 
 MKP_IV can be generated like this :
