@@ -48,7 +48,7 @@ defmodule MakeProxy.Worker.Client do
         :telemetry.execute(@telemetry_event, %{}, %{
           error: error,
           remote_address: socket.span.start_metadata.remote_address,
-          ctx: "do handler"
+          ctx: "handle_data/3"
         })
 
         {:error, "#{inspect(error)}", state}
@@ -82,7 +82,7 @@ defmodule MakeProxy.Worker.Client do
     :telemetry.execute(@telemetry_event, %{}, %{
       error: msg,
       remote_address: socket.span.start_metadata.remote_address,
-      ctx: "handle_info_unknown msg"
+      ctx: "handle_info/2"
     })
 
     {:stop, "#{inspect(msg)}", so_st}

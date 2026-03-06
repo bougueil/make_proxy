@@ -22,13 +22,14 @@ defmodule MakeProxy.Worker.Server do
         {:continue, %{state | remote: remote}, @timeout}
 
       {:error, {:connect_failure, _ip, _}} ->
+        # do not trigger telemetry events for connect_failure
         {:close, state}
 
       error ->
         :telemetry.execute(@telemetry_event, %{}, %{
           error: error,
           remote_address: socket.span.start_metadata.remote_address,
-          ctx: "connect_to_remote"
+          ctx: "invalid_connection_params"
         })
 
         {:close, state}
@@ -45,13 +46,15 @@ defmodule MakeProxy.Worker.Server do
         {:close, state}
 
       error ->
+        error = "#{inspect(error)}"
+
         :telemetry.execute(@telemetry_event, %{}, %{
           error: error,
           remote_address: socket.span.start_metadata.remote_address,
-          ctx: "connect_2"
+          ctx: "unable_to_forward"
         })
 
-        {:error, "#{inspect(error)}", state}
+        {:error, error, state}
     end
   end
 
@@ -59,7 +62,7 @@ defmodule MakeProxy.Worker.Server do
     :telemetry.execute(@telemetry_event, %{}, %{
       error: reason,
       remote_address: socket.span.start_metadata.remote_address,
-      ctx: "handle_error"
+      ctx: "handle_error/3"
     })
   end
 
@@ -82,7 +85,7 @@ defmodule MakeProxy.Worker.Server do
     :telemetry.execute(@telemetry_event, %{}, %{
       error: msg,
       remote_address: socket.span.start_metadata.remote_address,
-      ctx: "handle_info_unknown"
+      ctx: "handle_info/2"
     })
 
     {:stop, {:shutdown, :peer_closed}, so_st}

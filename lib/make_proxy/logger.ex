@@ -34,7 +34,7 @@ defmodule MakeProxy.Logger do
         _config
       ) do
     Logger.error(
-      "alert make_proxy_#{server_type} access from #{remote_address |> :inet.ntoa()} error=#{inspect(error)} ctx=#{inspect(ctx)}"
+      "alert make_proxy_#{server_type} access from: #{remote_address |> :inet.ntoa()} error: #{inspect(error)} ctx: #{inspect(ctx)}"
     )
   end
 
