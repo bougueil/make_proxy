@@ -1,8 +1,9 @@
 # Changelog
 
-## v0.4.0  (2025-09-22)
+## v0.4.0  (not-released)
  * add systemd/User (~/.config/systemd/user/)
  * address ipv6 connectivity
+ * add system documentation
 
 ## v0.3.0  (2025-09-22)
  * change socket backend

@@ -2,6 +2,8 @@ defmodule MakeProxy.MixProject do
   use Mix.Project
 
   @version "0.3.0"
+  @description "HTTP/HTTPS/Socks4/Socks5 proxy in Elixir"
+  @source_url "https://github.com/bougueil/make_proxy"
 
   def project do
     [
@@ -11,7 +13,10 @@ defmodule MakeProxy.MixProject do
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       releases: releases(),
-      deps: deps()
+      deps: deps(),
+      package: package(),
+      description: @description,
+      name: "make_proxy"
     ]
   end
 
@@ -53,5 +58,17 @@ defmodule MakeProxy.MixProject do
         "dialyzer --unmatched_returns"
       ]
     ]
+  end
+
+  defp package do
+    %{
+      licenses: ["BSD-4-Clause license"],
+      maintainers: ["bougueil"],
+      links: %{
+        "Changelog" => "#{@source_url}/blob/main/CHANGELOG.md",
+        "GitHub" => @source_url
+      },
+      files: ["lib", "mix.exs", "README.md", "CHANGELOG.md", ".formatter.exs"]
+    }
   end
 end

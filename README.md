@@ -1,7 +1,7 @@
 # MakeProxy
 [![Test](https://github.com/bougueil/make_proxy/actions/workflows/ci.yml/badge.svg)](https://github.com/bougueil/make_proxy/actions/workflows/ci.yml)
 
-Fork of Erlang [make-proxy](https://github.com/yueyoum/make-proxy) for Elixir with supervisor and Systemd.
+Fork of Erlang [make-proxy](https://github.com/yueyoum/make-proxy) for Elixir with supervisor, ipv6 and Systemd.
 
 `make_proxy` needs to be installed on a server (the proxy) and its clients.
 
