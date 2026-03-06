@@ -37,13 +37,6 @@ config :make_proxy,
   worker: System.fetch_env!("WORKER_TYPE") |> String.to_atom()
 ```
 
-The umbrella app may log `make_proxy` errors :
-```
-# in application.ex
-MakeProxy.Logger.attach_events()
-```
-
-
 ### systemd
 
 #### 🔐 Configure env variables :
